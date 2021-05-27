@@ -19,6 +19,42 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.sun.scenario.effect.ImageData;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import com.itextpdf.io.image.ImageDataFactory; 
+import com.itextpdf.kernel.pdf.PdfDocument; 
+import com.itextpdf.layout.element.Image;  
+import com.itextpdf.text.Element;
+import com.itextpdf.text.pdf.draw.LineSeparator;
+import static java.awt.image.ImageObserver.WIDTH;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
+
 
 /**
  *
@@ -28,18 +64,64 @@ public class Template extends javax.swing.JFrame {
     Connection conn=null;
 ResultSet rs=null;
 PreparedStatement pst=null;
+int y=320;
+int templateId=0;
+int sectionId=0;
+int subsectionId=0;
+ArrayList<JTextField> session_title = new ArrayList<JTextField>();
+ArrayList<JTextField> session_code = new ArrayList<JTextField>();
+ArrayList<JTextField> session_comment = new ArrayList<JTextField>();
+
+int session_count=1;
 
     /**
      * Creates new form Template
      */
     public Template() {
         initComponents();
-      
+      this.session_title.add(this.txt_tittleS1);
+      this.session_code.add(this.txt_codeS1);
+       this.session_comment.add(this.txt_commentS1);
          conn=db.java_db();
         Toolkit toolkit = getToolkit();
         Dimension size = toolkit.getScreenSize();
         setLocation(size.width/2 - getWidth()/2, 
         size.height/2 - getHeight()/2);
+        
+        try {
+        String qtid = "select Id from Templates order by Id desc limit 1";
+            pst=conn.prepareStatement(qtid);
+           rs=pst.executeQuery();
+           templateId =rs.getInt("Id");
+        String qsid = "select Id from Section order by Id desc limit 1";
+            pst=conn.prepareStatement(qsid);
+           rs=pst.executeQuery();
+           sectionId =rs.getInt("Id");
+            String qssid = "select Id from SubSection order by Id desc limit 1";
+            pst=conn.prepareStatement(qssid);
+           rs=pst.executeQuery();
+           subsectionId =rs.getInt("Id");
+           
+           
+           
+        }  catch (Exception e)
+
+            {
+                JOptionPane.showMessageDialog(null,e);
+            }
+            finally {
+
+                try{
+                    rs.close();
+                    pst.close();
+
+                }
+                catch(Exception e){
+
+                }
+            }
+
+        
     }
 
     /**
@@ -52,39 +134,30 @@ PreparedStatement pst=null;
     private void initComponents() {
 
         jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
-        jFrame1 = new javax.swing.JFrame();
         jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        txt_Slogan = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         img = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
-        jPanel3 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        txt_Tittle = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        Save = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        txt_tittleS1 = new javax.swing.JTextField();
+        txt_codeS1 = new javax.swing.JTextField();
+        txt_commentS1 = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
 
         jCheckBoxMenuItem1.setSelected(true);
         jCheckBoxMenuItem1.setText("jCheckBoxMenuItem1");
 
-        javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
-        jFrame1.getContentPane().setLayout(jFrame1Layout);
-        jFrame1Layout.setHorizontalGroup(
-            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        jFrame1Layout.setVerticalGroup(
-            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
 
-        jTextField1.setText("Slogan");
+        txt_Slogan.setText("Slogan");
 
         jButton1.setText("Browse");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -111,7 +184,7 @@ PreparedStatement pst=null;
         );
         jDesktopPane1.setLayer(img, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jTextField5.setText("Tittle");
+        txt_Tittle.setText("Tittle");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -127,8 +200,8 @@ PreparedStatement pst=null;
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(173, 173, 173)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
-                            .addComponent(jTextField5))))
+                            .addComponent(txt_Slogan, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                            .addComponent(txt_Tittle))))
                 .addContainerGap(145, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -139,42 +212,10 @@ PreparedStatement pst=null;
                     .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_Slogan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_Tittle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(30, Short.MAX_VALUE))
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Section 1", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial Black", 1, 14))); // NOI18N
-
-        jTextField2.setText("Tittle");
-
-        jTextField3.setText("Code");
-
-        jTextField4.setText("Comment");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(78, 78, 78)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(89, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
         );
 
         jButton2.setText("Add Section");
@@ -184,39 +225,112 @@ PreparedStatement pst=null;
             }
         });
 
-        jButton3.setText("jButton3");
+        Save.setText("Save");
+        Save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel2.setPreferredSize(new java.awt.Dimension(585, 32000));
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Section 1", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial Black", 1, 14))); // NOI18N
+
+        txt_tittleS1.setText("Tittle");
+
+        txt_codeS1.setText("Code");
+
+        txt_commentS1.setText("Comment");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(78, 78, 78)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txt_commentS1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_codeS1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_tittleS1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(txt_tittleS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addComponent(txt_codeS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txt_commentS1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(84, 84, 84))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(31723, Short.MAX_VALUE))
+        );
+
+        jScrollPane1.setViewportView(jPanel2);
+
+        jButton4.setText("Back");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(81, 81, 81)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(258, Short.MAX_VALUE))
+                        .addGap(254, 254, 254)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGap(231, 231, 231)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton3)
-                                .addGap(18, 18, 18)
+                                .addComponent(Save)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                                 .addComponent(jButton2))
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton4)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
-                .addGap(29, 29, 29))
+                    .addComponent(Save)
+                    .addComponent(jButton2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -224,12 +338,14 @@ PreparedStatement pst=null;
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+  
+
          JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(null);
         File f = chooser.getSelectedFile();
         
         filename =f.getAbsolutePath();
-        ImageIcon imageIcon = new ImageIcon(new ImageIcon(filename).getImage().getScaledInstance(img.getWidth(), img.getHeight(), Image.SCALE_DEFAULT));
+        ImageIcon imageIcon = new ImageIcon(new ImageIcon(filename).getImage().getScaledInstance(img.getWidth(), img.getHeight(), java.awt.Image.SCALE_DEFAULT));
         img.setIcon(imageIcon);
       try {
 
@@ -273,6 +389,207 @@ PreparedStatement pst=null;
         addSection();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
+        // TODO add your handling code here:
+//        JOptionPane.showInputDialog(session_code.size());
+        int p = JOptionPane.showConfirmDialog(null, "Are you sure you want to Save?","Save",JOptionPane.YES_NO_OPTION);
+        if(p==0){
+
+                    
+            try {
+                String sql ="insert into Templates" 
+                          + "(Logo,Slogan,Tittle,Id) values (?,?,?,?) ";
+                  
+                pst=conn.prepareStatement(sql);
+                
+                pst.setBytes(1,Product_Image);
+                pst.setString(2,txt_Slogan.getText());
+                pst.setString(3,txt_Tittle.getText());
+                pst.setInt(4,++templateId);
+                
+                pst.execute();
+//                  String sq ="insert into Section" 
+//                          + "(Tittle,TemplateId,Id) values (?,?,?) ";
+//                  pst=conn.prepareStatement(sq);
+//                  
+//                    //pst.setString(1,txt_Tittle.getText());
+//                    
+//                    pst.setInt(2,templateId);
+//                    pst.setInt(3,++sectionId);
+//                    
+//                     pst.execute();
+//                      String s ="insert into SubSection" 
+//                          + "(Code,Comment,SectionId,Id) values (?,?,?,?) ";
+//                         pst=conn.prepareStatement(s);
+//                          pst.setString(1,txt_codeS1.getText());
+//                          pst.setString(2,txt_commentS1.getText());
+//                          pst.setInt(3,sectionId);
+//                          pst.setInt(4,++subsectionId);
+//                        pst.execute();
+                JOptionPane.showMessageDialog(null,"Data is saved successfully");
+                for(int i=0; i<this.session_title.size(); i++)
+                {
+                     String s1 ="insert into Section" 
+                          + "(Tittle,TemplateId,Id) values (?,?,?) ";
+                       pst=conn.prepareStatement(s1);
+                    pst.setString(1,this.session_title.get(i).getText());
+                    pst.setInt(2,templateId);
+                    pst.setInt(3,++sectionId);
+                pst.execute();
+                String s2 ="insert into SubSection" 
+                          + "(Code,Comment,SectionId,Id) values (?,?,?,?) ";
+                         pst=conn.prepareStatement(s2);
+                     pst.setString(1,this.session_code.get(i).getText());
+                      pst.setString(2,this.session_comment.get(i).getText());
+                          pst.setInt(3,sectionId);
+                          pst.setInt(4,++subsectionId);
+                 pst.execute();
+                
+                
+            
+                
+                }
+                CreatePdf(templateId);
+                 try{
+                    rs.close();
+                    pst.close();
+
+                }
+                 catch(Exception e){
+                  //JOptionPane.showMessageDialog(null,e);
+                }
+                this.dispose();
+
+            }
+            catch (Exception e)
+
+            {   
+            e.printStackTrace();
+             JOptionPane.showMessageDialog(null,"Error! Fields cannot be empty.");
+            }
+            finally {
+
+                try{
+                    rs.close();
+                    pst.close();
+
+                }
+                 catch(Exception e){
+                  //JOptionPane.showMessageDialog(null,e);
+                }
+            }
+                
+    }                  
+        
+    }//GEN-LAST:event_SaveActionPerformed
+
+    private void CreatePdf(int r){
+        
+           
+            String filePath = r+".pdf";
+            
+           // String imFile = "C:/itextExamples/logo.jpg";       
+             
+              
+            
+            try {
+            // TODO add your handling code here:
+            
+            String sql ="select Templates.Id as tid,Templates.Tittle as Ttittle,Section.Tittle as Stittle ,Section.Id as sid, SubSection.Id as ssid,* from Templates left outer join Section on Templates.Id = Section.TemplateId \n" +
+"left OUTER JOIN SubSection on sid = SubSection.SectionId where tid="+r;
+            
+ 
+            pst=conn.prepareStatement(sql);
+            rs=pst.executeQuery();
+            TableModel t = DbUtils.resultSetToTableModel(rs);
+            Document myDocument = new Document();
+            
+            
+           PdfWriter myWriter = PdfWriter.getInstance(myDocument, new FileOutputStream(filePath));
+            //com.itextpdf.io.image.ImageData data = ImageDataFactory.create(Product_Image);
+              //Image image = new Image(data);  
+       
+           myDocument.open();
+                 //myDocument.add(new Paragraph(rs.getByte(1)));
+           
+           
+           
+                 myDocument.add(new Paragraph(("                                                                                            "),FontFactory.getFont(FontFactory.TIMES_BOLD,20,Font.BOLD )));
+           
+                 myDocument.add(new Paragraph(("                                                                                             "),FontFactory.getFont(FontFactory.TIMES_BOLD,20,Font.BOLD )));
+           
+                 myDocument.add(new Paragraph(("                                                                                              "),FontFactory.getFont(FontFactory.TIMES_BOLD,20,Font.BOLD )));
+                 Paragraph pp = new Paragraph(t.getValueAt(0, 7).toString(),FontFactory.getFont(FontFactory.TIMES_ITALIC,8,Font.ITALIC ));
+//                 Paragraph pp = new Paragraph(rs.getString("Slogan"),FontFactory.getFont(FontFactory.TIMES_ITALIC,8,Font.ITALIC ));
+                 pp.setAlignment(Element.ALIGN_CENTER);
+                 myDocument.add(pp); 
+                 
+                
+                   Paragraph ps= new Paragraph(t.getValueAt(0, 1).toString(),FontFactory.getFont(FontFactory.HELVETICA,22,Font.BOLD ));
+                  ps.setAlignment(Element.ALIGN_CENTER);
+                          myDocument.add(ps);
+                 myDocument.add(new Paragraph("                         "));
+                 myDocument.add(new LineSeparator());
+                 for (int i = 0; i < t.getRowCount(); i++) {
+                 myDocument.add(new Paragraph(t.getValueAt(i, 2).toString(),FontFactory.getFont(FontFactory.HELVETICA,14,Font.PLAIN )));
+                    
+                    Object code = t.getValueAt(i, 14);
+                    Object comment = t.getValueAt(i, 15);
+                  myDocument.add(new Paragraph(code==null?"":code.toString(),FontFactory.getFont(FontFactory.HELVETICA,12,Font.BOLD )));
+                   myDocument.add(new Paragraph(comment==null?"":comment.toString(),FontFactory.getFont(FontFactory.HELVETICA,12,Font.PLAIN )));
+                 myDocument.add(new Paragraph(" "));
+                 myDocument.add(new LineSeparator());
+                }
+           
+            
+            
+            
+             myDocument.close();  
+           JOptionPane.showMessageDialog(null,"Template was successfully generated");
+            
+     }
+        catch(Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,e);
+         
+         
+     }
+     finally {
+            
+            try{
+                rs.close();
+                pst.close();
+                
+            }
+            catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+         
+            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            }
+           
+            
+        
+        
+    }
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+//         TemplateCreation T = new TemplateCreation();
+//        T.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -309,27 +626,60 @@ PreparedStatement pst=null;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Save;
     private javax.swing.JLabel img;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JDesktopPane jDesktopPane1;
-    private javax.swing.JFrame jFrame1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField txt_Slogan;
+    private javax.swing.JTextField txt_Tittle;
+    private javax.swing.JTextField txt_codeS1;
+    private javax.swing.JTextField txt_commentS1;
+    private javax.swing.JTextField txt_tittleS1;
     // End of variables declaration//GEN-END:variables
 private void addSection(){
-//jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Section 1", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial Black", 1, 14)));
+
+JTextField titleText = new JTextField();
+titleText.setText("Title");
+Dimension d = new Dimension(355, 25);
+titleText.setPreferredSize(d);
+this.session_title.add(titleText);
+
+JTextField codeText = new JTextField();
+codeText.setText("Code");
+codeText.setPreferredSize(d);
+this.session_code.add(codeText);
+
+JTextField commentText = new JTextField();
+commentText.setText("Comment");
+d = new Dimension(d.width,150);
+commentText.setPreferredSize(d);
+this.session_comment.add(commentText);
+
+
 JPanel panel = new JPanel();
-panel.setBorder(BorderFactory.createTitledBorder(null, "Section 2", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial Black", 1, 14)));
-jFrame1.add(panel);
+panel.setBackground(Color.lightGray);
+panel.setSize(500,279);
+panel.setLocation(20, y);
+
+
+panel.add(titleText);
+panel.add(codeText);
+panel.add(commentText);
+jPanel2.add(panel);
+jScrollPane1.updateUI();
+jPanel2.updateUI();
+y+=290;
+
 }
+
+
 private ImageIcon format =null;
     //strin filename
     String filename = null;
